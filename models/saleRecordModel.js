@@ -32,3 +32,20 @@ const saleRecordSchema = new mongoose.Schema({
 
 const saleRecordModel = mongoose.model("saleRecordModel", saleRecordSchema);
 module.exports = saleRecordModel;
+
+/*
+
+chemist will give an order so order schema
+
+orders: {
+  order_id: '',
+  product_id: '',
+  product_sale: '',
+  chem_id: '',
+  emp_id:''
+  order_time: ''
+}
+
+const orderSchema = new Schema({})
+
+*/

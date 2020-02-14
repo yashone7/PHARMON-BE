@@ -33,4 +33,35 @@ router.post(
   }
 );
 
+router.patch(
+  "/:id",
+  [
+    check("product_name", "product name is required")
+      .not()
+      .isEmpty()
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      let product = await productModel.findByIdAndUpdate(
+        req.params.id,
+        { $set: { product_name: req.body.product_name } },
+        { new: true, upsert: false }
+      );
+      if (!product) {
+        return res
+          .status(400)
+          .json({ errors: [{ msg: "product does not exist" }] });
+      }
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send("server error");
+    }
+    res.send(req.body);
+  }
+);
+
 module.exports = router;

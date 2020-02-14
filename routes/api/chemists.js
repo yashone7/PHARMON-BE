@@ -38,13 +38,7 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const {
-      chem_name,
-      chem_contact,
-      chem_phone,
-      chem_sale,
-      chem_location
-    } = req.body;
+    const { chem_name, chem_contact, chem_phone, chem_location } = req.body;
     try {
       // check to see if the chemist exists if not then create
       let chemist = await chemModel.findOne({ chem_phone });
@@ -57,7 +51,6 @@ router.post(
         chem_name,
         chem_contact,
         chem_phone,
-        chem_sale,
         chem_location
       });
 

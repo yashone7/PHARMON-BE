@@ -1,7 +1,6 @@
 const express = require("express");
 const _ = require("lodash");
 const router = express.Router();
-const { check, validationResult } = require("express-validator");
 const saleRecordModel = require("../../models/saleRecordModel");
 
 // custom validaton middleware for checking emp_workRecord of employee
@@ -20,40 +19,42 @@ function checkWorkRecord(req, res, next) {
 
   next();
 }
+// create a post resource to create a blank resoure and then use update
+// operator to patch it
+
+// This should be a protected route
+router.post("/:id", [], async (req, res) => {
+  try {
+    let saleRecord = await saleRecordModel.findOne({ emp_id: req.params.id });
+    if (saleRecord) {
+      return res.status(400).send("Sale record of employee already exists");
+    }
+    saleRecord = new saleRecordModel({
+      emp_id: req.params.id,
+      summary: []
+    });
+    await saleRecord.save();
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("server error");
+  }
+  res.send("sale record created");
+});
 
 // This route is used for updating the sale of the employees
-router.patch(
-  "/",
-  [
-    checkWorkRecord,
-    [
-      check("emp_id", "employee id is required")
-        .not()
-        .isEmpty()
-    ]
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    const { emp_id, summary } = req.body;
-    // const sale = summary[0].chem_sale[0];
-    // console.log(sale);
-    // console.log(summary[0]);
-    try {
-      let saleRecord = await saleRecordModel.findOneAndUpdate({ emp_id });
-      saleRecord = new saleRecordModel({
-        emp_id: emp_id,
-        summary: req.body.summary[0]
-      });
-      await saleRecord.save();
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("server error");
-    }
-    return res.send(req.body);
+router.patch("/:id", [checkWorkRecord], async (req, res) => {
+  try {
+    let saleRecord = await saleRecordModel.findOneAndUpdate(
+      { emp_id: req.params.id },
+      { $addToSet: { summary: req.body.summary } },
+      { new: true, upsert: false }
+    );
+    await saleRecord.save();
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("server error");
   }
-);
+  return res.send(req.body);
+});
 
 module.exports = router;

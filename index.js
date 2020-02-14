@@ -19,6 +19,7 @@ app.use("/api/admins", require("./routes/api/admins"));
 app.use("/api/employees/sale", require("./routes/api/empSale"));
 app.use("/api/employees/work", require("./routes/api/empWorkRecord"));
 app.use("/api/products", require("./routes/api/products"));
+app.use("/api/orders", require("./routes/api/orders"));
 app.use("/api/employees/territory", require("./routes/api/empTerritory"));
 //app.use("/api/auth/admins", require("./routes/api/adminAuth"));
 

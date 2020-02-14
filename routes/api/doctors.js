@@ -103,4 +103,9 @@ router.delete("/:id", [[auth, checkAdmin]], async (req, res) => {
   res.json({ msg: "doctor removed..." });
 });
 
+/* router.patch('/:id', [], async (req, res) => {
+
+});
+*/
+
 module.exports = router;
