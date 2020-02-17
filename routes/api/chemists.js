@@ -4,9 +4,6 @@ const { check, validationResult } = require("express-validator");
 const _ = require("lodash");
 const chemModel = require("../../models/chemistsModel");
 
-// Validation to be carried out here
-// creating updating deleting users should be carried out here
-
 // custom validaton middleware for location of chemist
 function checkLocationSchema(req, res, next) {
   const { type, coordinates } = req.body.chem_location;
@@ -59,9 +56,40 @@ router.post(
       console.error(err.message);
       res.status(500).send("server error");
     }
-
     res.send(req.body);
   }
 );
+
+router.get("/", async (req, res) => {
+  const chemist = await chemModel.find();
+  res.send(chemist);
+});
+
+router.get("/:id", async (req, res) => {
+  const chemist = await chemModel.findById(req.params.id);
+  if (!chemist) {
+    res.status(404).send("The chemist with the gicen id does not exist");
+  }
+  res.send(chemist);
+});
+
+// update operation
+router.patch("/:id", [], async (req, res) => {
+  const update = {};
+  _.assign(update, req.body);
+  chemModel
+    .updateOne({ _id: req.params.id }, { $set: update })
+    .exec()
+    .then(result => res.status(200).json(result))
+    .catch(err => console.error(err.message));
+});
+
+router.delete("/:id", async (req, res) => {
+  const chemist = await chemModel.findByIdAndDelete(req.params.id);
+  if (!chemist) {
+    return res.status(400).send("The chemist with given id does not exist");
+  }
+  res.status(200).send("chemist deleted");
+});
 
 module.exports = router;

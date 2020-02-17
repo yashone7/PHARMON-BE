@@ -93,9 +93,10 @@ router.get(
     const doctor = await docModel.findById({ _id: req.params.id });
     if (!doctor)
       return res.json({ msg: "doctor with given id does not exist" });
-    res.json({ doctor });
+    res.send(doctor);
   }
 );
+
 router.delete("/:id", [[auth, checkAdmin]], async (req, res) => {
   const doctor = await docModel.findOne({ _id: req.params.id });
   if (!doctor) return res.json({ msg: "doctor with given id does not exist" });
@@ -103,9 +104,15 @@ router.delete("/:id", [[auth, checkAdmin]], async (req, res) => {
   res.json({ msg: "doctor removed..." });
 });
 
-/* router.patch('/:id', [], async (req, res) => {
-
+// updating a doctor with given id
+router.patch("/:id", [], async (req, res) => {
+  const update = {};
+  _.assign(update, req.body);
+  docModel
+    .updateOne({ _id: req.params.id }, { $set: update })
+    .exec()
+    .then(result => res.status(200).json(result))
+    .catch(err => console.error(err.message));
 });
-*/
 
 module.exports = router;

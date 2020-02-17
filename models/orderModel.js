@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
-  order_id: {
-    type: mongoose.Types.ObjectId
-  },
+  // order_id: {
+  //   type: mongoose.Types.ObjectId
+  // },
   product_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "productModel",
@@ -30,3 +30,8 @@ const orderSchema = new mongoose.Schema({
 
 const orderModel = new mongoose.model("orderModel", orderSchema);
 module.exports = orderModel;
+
+/* 
+Product id should come from product name - implement product search
+Chemist id should come from chemist name - implement chemist search 
+*/

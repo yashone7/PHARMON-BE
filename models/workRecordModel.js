@@ -12,35 +12,26 @@ let multiPointSchema = new mongoose.Schema({
   }
 });
 
-let wordRecordSchema = new mongoose.Schema({
+const workRecordSchema = mongoose.Schema({
   emp_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "employeeModel",
     required: true
   },
-  workSummary: [
-    {
-      doc_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "docModel",
-        required: true
-      },
-      doc_location: {
-        type: multiPointSchema,
-        required: true
-      },
-      products: [
-        {
-          product_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "productModel",
-            required: true
-          }
-        }
-      ]
-    }
-  ]
+  doc_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "docModel"
+  },
+  doc_location: {
+    type: multiPointSchema,
+    required: true
+  },
+  products: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "productModel",
+    required: true
+  }
 });
 
-const workRecordModel = mongoose.model("workRecordModel", wordRecordSchema);
+const workRecordModel = new mongoose.model("workRecordModel", workRecordSchema);
 module.exports = workRecordModel;

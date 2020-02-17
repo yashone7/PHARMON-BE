@@ -67,8 +67,42 @@ router.post(
       res.status(500).send("server error");
     }
 
-    res.send(req.body);
+    res.status(200).send("distrubtor created");
   }
 );
+
+// update operation
+router.patch("/:id", [], async (req, res) => {
+  const update = {};
+  _.assign(update, req.body);
+  distModel
+    .updateOne({ _id: req.params.id }, { $set: update })
+    .exec()
+    .then(result => res.status(200).json(result))
+    .catch(err => console.error(err.message));
+});
+
+router.get("/", async (req, res) => {
+  const distributors = await distModel.find();
+  res.send(distributors);
+});
+
+router.get(
+  "/:id",
+  /*[[auth, checkAdmin]]*/ async (req, res) => {
+    const distributor = await distModel.findById({ _id: req.params.id });
+    if (!distributor)
+      return res.json({ msg: "distributor with given id does not exist" });
+    res.send(distributor);
+  }
+);
+
+router.delete("/:id", async (req, res) => {
+  const distributor = await distModel.findByIdAndDelete(req.params.id);
+  if (!distributor) {
+    return res.status(400).send("The distributor with given id does not exist");
+  }
+  res.status(200).send("distributor deleted");
+});
 
 module.exports = router;

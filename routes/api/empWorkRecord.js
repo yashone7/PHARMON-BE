@@ -6,32 +6,24 @@ const workRecordModel = require("../../models/workRecordModel");
 // here we write the logic for recording the work record of the employee
 
 // custom middleware to check location
-function checkLocation(req, res, next) {
-  for (let record of req.body.workSummary) {
-    const { doc_id, doc_location, products } = record;
-    const { type, coordinates } = doc_location;
-    const coords = _.flattenDeep(coordinates);
-    for (let product of products) {
-      const { product_id } = product;
-      if (
-        _.isEmpty(doc_id) ||
-        _.isEmpty(type) ||
-        _.isEmpty(coords) ||
-        _.isEmpty(product_id)
-      ) {
-        return res.status(400).send("please enter work summary of all records");
-      }
-    }
+function checkLocationAndProducts(req, res, next) {
+  const { doc_location, products } = req.body;
+  const { type, coordinates } = doc_location;
+  const locCoordinates = _.flattenDeep(coordinates);
+  if (_.isEmpty(type) || _.isEmpty(locCoordinates) || _.isEmpty(products)) {
+    return res.status(400).json({
+      message: `type: ${type}, coordinates: ${locCoordinates}, products: ${products} cannot be empty`
+    });
   }
   next();
 }
 
 router.post(
-  "/",
+  "/:id",
   [
-    checkLocation,
+    checkLocationAndProducts,
     [
-      check("emp_id", "employee id is required")
+      check("doc_id", "doctor id is required")
         .not()
         .isEmpty()
     ]
@@ -41,17 +33,17 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { emp_id } = req.body;
+    //we will pass doctor id and employee id as query headers.
+    const { doc_id } = req.body;
     try {
-      let workSummary = await workRecordModel.findOneAndUpdate(
-        { emp_id },
-        { new: true }
-      );
-      workSummary = new workRecordModel({
-        emp_id,
-        workSummary: req.body.workSummary[0]
+      let workRecord = await workRecordModel.findOne({ emp_id: req.params.id });
+      workRecord = new workRecordModel({
+        doc_id,
+        emp_id: req.params.id,
+        doc_location: req.body.doc_location,
+        products: req.body.products
       });
-      await workSummary.save();
+      await workRecord.save();
     } catch (err) {
       console.error(err.message);
       res.status(500).send("server error");

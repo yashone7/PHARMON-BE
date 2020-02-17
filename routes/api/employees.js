@@ -5,11 +5,7 @@ const bcrypt = require("bcryptjs");
 const { check, validationResult } = require("express-validator");
 const employeeModel = require("../../models/employeesModel");
 
-// Validation to be carried out here
-// creating updating deleting users should be carried out here
-
 // pass in checkAdmin middleware to access protected routes
-
 // HTTP verb - POST - registering a new employee private access
 router.post(
   "/",
@@ -56,5 +52,39 @@ router.post(
     res.send(req.body);
   }
 );
+
+// update operation
+router.patch("/:id", [], async (req, res) => {
+  const update = {};
+  _.assign(update, req.body);
+  employeeModel
+    .updateOne({ _id: req.params.id }, { $set: update })
+    .exec()
+    .then(result => res.status(200).json(result))
+    .catch(err => console.error(err.message));
+});
+
+router.get("/:id", async (req, res) => {
+  const employee = await employeeModel.findById(req.params.id);
+  if (!employee) {
+    return res
+      .status(404)
+      .send("The employee with the given id does not exist");
+  }
+  res.status(200).send(employee);
+});
+
+router.get("/", async (req, res) => {
+  const employee = await employeeModel.find();
+  res.send(employee);
+});
+
+router.delete("/:id", async (req, res) => {
+  employeeModel
+    .findOneAndDelete({ _id: req.params.id })
+    .exec()
+    .then(result => res.status(200).json(result))
+    .catch(err => console.error(err.message));
+});
 
 module.exports = router;

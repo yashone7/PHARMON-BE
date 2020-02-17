@@ -12,13 +12,6 @@ let multiPointSchema = new mongoose.Schema({
   }
 });
 
-let chemSaleSchema = new mongoose.Schema({
-  type: {
-    month: String,
-    sale: Number
-  }
-});
-
 let chemSchema = new mongoose.Schema({
   chem_name: {
     type: String,
@@ -35,10 +28,6 @@ let chemSchema = new mongoose.Schema({
     },
     required: true
   },
-  // chem_sale: {
-  //   type: mongoose.Schema.Types.Number,
-  //   ref: "saleRecordModel"
-  // },
   chem_location: {
     type: multiPointSchema,
     required: true
