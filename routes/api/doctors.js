@@ -98,10 +98,9 @@ router.get(
 );
 
 router.delete("/:id", [[auth, checkAdmin]], async (req, res) => {
-  const doctor = await docModel.findOne({ _id: req.params.id });
+  const doctor = await docModel.findByIdAndDelete({ _id: req.params.id });
   if (!doctor) return res.json({ msg: "doctor with given id does not exist" });
-  doctor = await docModel.findOneAndRemove({ _id: req.id });
-  res.json({ msg: "doctor removed..." });
+  res.status(200).send("doctor removed...");
 });
 
 // updating a doctor with given id
