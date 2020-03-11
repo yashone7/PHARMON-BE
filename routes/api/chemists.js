@@ -3,7 +3,8 @@ const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const _ = require("lodash");
 const chemModel = require("../../models/chemistsModel");
-
+const auth = require("../../middleware/auth");
+const checkAdmin = require("../../middleware/checkAdmin");
 // custom validaton middleware for location of chemist
 function checkLocationSchema(req, res, next) {
   const { type, coordinates } = req.body.chem_location;
@@ -19,15 +20,19 @@ function checkLocationSchema(req, res, next) {
 router.post(
   "/",
   [
-    check("chem_name", "name is required")
-      .not()
-      .isEmpty(),
-    check("chem_phone", "phone number is required")
-      .not()
-      .isEmpty(),
-    check("chem_contact", "contact is required")
-      .not()
-      .isEmpty()
+    auth,
+    checkAdmin,
+    [
+      check("chem_name", "name is required")
+        .not()
+        .isEmpty(),
+      check("chem_phone", "phone number is required")
+        .not()
+        .isEmpty(),
+      check("chem_contact", "contact is required")
+        .not()
+        .isEmpty()
+    ]
   ],
   checkLocationSchema,
   async (req, res) => {
@@ -60,8 +65,8 @@ router.post(
   }
 );
 
-router.get("/", async (req, res) => {
-  const chemist = await chemModel.find();
+router.get("/", [auth], async (req, res) => {
+  const chemist = await chemModel.find().select("-__v");
   res.send(chemist);
 });
 
@@ -74,7 +79,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // update operation
-router.patch("/:id", [], async (req, res) => {
+router.patch("/:id", [auth, checkAdmin], async (req, res) => {
   const update = {};
   _.assign(update, req.body);
   chemModel
@@ -84,7 +89,7 @@ router.patch("/:id", [], async (req, res) => {
     .catch(err => console.error(err.message));
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, checkAdmin], async (req, res) => {
   const chemist = await chemModel.findByIdAndDelete(req.params.id);
   if (!chemist) {
     return res.status(400).send("The chemist with given id does not exist");

@@ -3,7 +3,8 @@ const _ = require("lodash");
 const { check, validationResult } = require("express-validator");
 const distModel = require("../../models/distributorsModel");
 const router = express.Router();
-
+const auth = require("../../middleware/auth");
+const checkAdmin = require("../../middleware/checkAdmin");
 // Validation to be carried out here
 // creating updating deleting users should be carried out here
 
@@ -22,15 +23,19 @@ function checkLocationSchema(req, res, next) {
 router.post(
   "/",
   [
-    check("dist_name", "name is required")
-      .not()
-      .isEmpty(),
-    check("dist_phone", "phone number is required")
-      .not()
-      .isEmpty(),
-    check("dist_contact", "contact is required")
-      .not()
-      .isEmpty()
+    auth,
+    checkAdmin,
+    [
+      check("dist_name", "name is required")
+        .not()
+        .isEmpty(),
+      check("dist_phone", "phone number is required")
+        .not()
+        .isEmpty(),
+      check("dist_contact", "contact is required")
+        .not()
+        .isEmpty()
+    ]
   ],
   checkLocationSchema,
   async (req, res) => {
@@ -72,7 +77,7 @@ router.post(
 );
 
 // update operation
-router.patch("/:id", [], async (req, res) => {
+router.patch("/:id", [auth, checkAdmin], async (req, res) => {
   const update = {};
   _.assign(update, req.body);
   distModel
@@ -82,22 +87,19 @@ router.patch("/:id", [], async (req, res) => {
     .catch(err => console.error(err.message));
 });
 
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   const distributors = await distModel.find();
   res.send(distributors);
 });
 
-router.get(
-  "/:id",
-  /*[[auth, checkAdmin]]*/ async (req, res) => {
-    const distributor = await distModel.findById({ _id: req.params.id });
-    if (!distributor)
-      return res.json({ msg: "distributor with given id does not exist" });
-    res.send(distributor);
-  }
-);
+router.get("/:id", [auth], async (req, res) => {
+  const distributor = await distModel.findById({ _id: req.params.id });
+  if (!distributor)
+    return res.json({ msg: "distributor with given id does not exist" });
+  res.send(distributor);
+});
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, checkAdmin], async (req, res) => {
   const distributor = await distModel.findByIdAndDelete(req.params.id);
   if (!distributor) {
     return res.status(400).send("The distributor with given id does not exist");

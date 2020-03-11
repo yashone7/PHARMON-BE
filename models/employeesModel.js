@@ -16,8 +16,8 @@ let employeeSchema = new mongoose.Schema({
   },
   emp_role: {
     type: String,
-    enum: ["admin", "msr"],
-    default: "msr",
+    enum: ["admin", "representative"],
+    default: "representative",
     required: true
   },
   /*sale is not marked required because employee is created by admin the sale details are updated by employee

@@ -3,6 +3,7 @@ const router = express.Router();
 const _ = require("lodash");
 const { check, validationResult } = require("express-validator");
 const workRecordModel = require("../../models/workRecordModel");
+const auth = require("../../middleware/auth");
 // here we write the logic for recording the work record of the employee
 
 // custom middleware to check location
@@ -21,6 +22,7 @@ function checkLocationAndProducts(req, res, next) {
 router.post(
   "/:id",
   [
+    auth,
     checkLocationAndProducts,
     [
       check("doc_id", "doctor id is required")

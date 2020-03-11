@@ -3,6 +3,7 @@ const router = express.Router();
 const _ = require("lodash");
 const { check, validationResult } = require("express-validator");
 const territoryModel = require("../../models/territoryModel");
+const auth = require("../../middleware/auth");
 
 // custom middleware to check location and territory details of employee
 function checkTerritoryDetails(req, res, next) {
@@ -23,6 +24,7 @@ function checkTerritoryDetails(req, res, next) {
 router.post(
   "/",
   [
+    auth,
     checkTerritoryDetails,
     [
       check("emp_id", "employee id is required")

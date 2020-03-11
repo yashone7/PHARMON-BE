@@ -2,14 +2,20 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const productModel = require("../../models/productModel");
+const auth = require("../../middleware/auth");
+const checkAdmin = require("../../middleware/checkAdmin");
 
 // Route for creating a product
 router.post(
   "/",
   [
-    check("product_name", "product name is required")
-      .not()
-      .isEmpty()
+    auth,
+    checkAdmin,
+    [
+      check("product_name", "product name is required")
+        .not()
+        .isEmpty()
+    ]
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -35,7 +41,7 @@ router.post(
 );
 
 // Route for updating a product
-router.patch("/:id", [], async (req, res) => {
+router.patch("/:id", [auth, checkAdmin], async (req, res) => {
   const update = {};
   _.assign(update, req.body);
   productModel
@@ -46,7 +52,7 @@ router.patch("/:id", [], async (req, res) => {
 });
 
 // Getting product all products
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   const products = await productModel.find().select("-__v");
   if (!products) {
     return res.status(404).send("No products exist");
@@ -55,7 +61,7 @@ router.get("/", async (req, res) => {
 });
 
 // Getting product by id
-router.get("/:id", async (req, res) => {
+router.get("/:id", [auth], async (req, res) => {
   const product = await productModel.findById(req.params.id).select("-__v");
   if (!product) {
     return res.status(404).send("The product with given id doesn not exist");
@@ -64,7 +70,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // deleting a product
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, checkAdmin], async (req, res) => {
   const product = await productModel.findByIdAndDelete(req.params.id);
   if (!product) {
     return res.status(400).send("The product with given id does not exist");

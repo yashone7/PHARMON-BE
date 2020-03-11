@@ -2,20 +2,24 @@ const express = require("express");
 const router = express.Router();
 const { check, validationResult } = require("express-validator");
 const orderModel = require("../../models/orderModel");
+const auth = require("../../middleware/auth");
 
 // Route for posting orders
 router.post(
   "/:id",
   [
-    check("chem_id", "employee id is required")
-      .not()
-      .isEmpty(),
-    check("product_id", "product id is required")
-      .not()
-      .isEmpty(),
-    check("product_sale", "product sale is required")
-      .not()
-      .isEmpty()
+    auth,
+    [
+      check("chem_id", "employee id is required")
+        .not()
+        .isEmpty(),
+      check("product_id", "product id is required")
+        .not()
+        .isEmpty(),
+      check("product_sale", "product sale is required")
+        .not()
+        .isEmpty()
+    ]
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -41,7 +45,7 @@ router.post(
 );
 
 // Route for getting all orders
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   const orders = await orderModel
     .find()
     .select("-__v")
@@ -52,7 +56,7 @@ router.get("/", async (req, res) => {
 });
 
 // Route to find orders by employee id
-router.get("/employees/:id", async (req, res) => {
+router.get("/employees/:id", [auth], async (req, res) => {
   console.log(req.query);
   const orders = await orderModel
     .find({ emp_id: req.params.id })
@@ -67,7 +71,7 @@ router.get("/employees/:id", async (req, res) => {
 });
 
 // Route to find orders by product id
-router.get("/products/:id", async (req, res) => {
+router.get("/products/:id", [auth], async (req, res) => {
   const orders = await orderModel
     .find({ product_id: req.params.id })
     .select("-__v")
