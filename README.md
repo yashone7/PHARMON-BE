@@ -4,20 +4,20 @@ A NodeJS based web application that allows pharma companies to keep track of the
 
 ## Tech stack used
 
-ExpressJS - for writing APIs
-ReactJS - front end
-Redux - state management
-React-Map-GL - (Uber open source) A react wrapper for creating maps
-Deck.gl - (Uber open source) WebGL powered visualizations
-ReCharts - a charting library
-Bulma - For Styling
-Lodash - ultilities
-JWT - authetication
-React Datepicker - dates
-Date fns - Date and time utility
-axios - network requests
-tailwindcss - Styling
-Fuze.js - Implementing fuzzy search
+-ExpressJS - for writing APIs
+-ReactJS - front end
+-Redux - state management
+-React-Map-GL - (Uber open source) A react wrapper for creating maps
+-Deck.gl - (Uber open source) WebGL powered visualizations
+-ReCharts - a charting library
+-Bulma - For Styling
+-Lodash - ultilities
+-JWT - authetication
+-React Datepicker - dates
+-Date fns - Date and time utility
+-axios - network requests
+-tailwindcss - Styling
+-Fuze.js - Implementing fuzzy search
 
 ## End points
 
